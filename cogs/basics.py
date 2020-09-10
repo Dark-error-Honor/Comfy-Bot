@@ -40,7 +40,13 @@ class Basics(commands.Cog):
         )
         embed.set_author(name='Help')
         embed.add_field(
-            name='.ping', value='Returns latency of the Comfy Bot', inline=True)
+            name='-help:', value='Returns this help page', inline=False)
+        embed.add_field(
+            name='-ping:', value='Returns latency of the Comfy Bot', inline=False)
+        embed.add_field(
+            name='-clean:', value='Cleans \{amount\} messages', inline=False)
+        embed.add_field(
+            name='-clean:', value='Cleans \{amount\} messages', inline=False)
 
         await ctx.send(embed=embed)
 

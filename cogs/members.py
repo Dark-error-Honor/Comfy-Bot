@@ -13,7 +13,27 @@ class Members(commands.Cog):
         role = discord.utils.get(member.guild.roles, name='Member')
         await member.add_roles(role)
 
+        for guild in self.client.guilds:
+            for channel in guild.text_channels:
+                if channel.name == 'welcome':
+                    await channel.send(f'{member.name} Joined the server!')
+
     # COMMANDS
+    @commands.command()
+    async def invite(self, ctx, *, member: discord.Member):
+        channel = await member.create_dm()
+        await channel.send(await ctx.channel.create_invite())
+
+    @commands.command()
+    async def roleadd(self, ctx, member: discord.Member, *, role):
+        role = discord.utils.get(member.guild.roles, name=role)
+        await member.add_roles(role)
+
+    @commands.command()
+    async def rolerem(self, ctx, member: discord.Member, *, role):
+        role = discord.utils.get(member.guild.roles, name=role)
+        await member.remove_roles(role)
+
     @commands.command()
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         await member.kick(reason=reason)
