@@ -3,7 +3,7 @@ import os
 from discord.ext import commands
 
 client = commands.Bot('-')
-client.remove_command('help')
+# client.remove_command('help')
 
 
 @client.command()

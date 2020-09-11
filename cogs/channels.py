@@ -13,6 +13,8 @@ class Channels(commands.Cog):
 
     @commands.command()
     async def makec(self, ctx, *args):
+        """make new channel args: 1: name 2: category 3: type 4: nsfw"""
+
         guild = ctx.message.guild
         for category in guild.categories:
             if category.name == args[1]:  # check if category matches 2nd argument
@@ -27,6 +29,8 @@ class Channels(commands.Cog):
 
     @commands.command()
     async def removec(self, ctx, name):
+        """remove channel args: name"""
+
         for guild in self.client.guilds:
             for channel in guild.text_channels:
                 if channel.name == name:
