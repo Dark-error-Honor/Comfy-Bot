@@ -62,7 +62,7 @@ class Members(commands.Cog):
 
     @commands.command()
     async def mute(self, ctx, time=0, *, member: discord.Member):
-
+        """ mutes specified member for specified time """
         if not member:
             ctx.send('Give me someone to mute pls.')
             return
