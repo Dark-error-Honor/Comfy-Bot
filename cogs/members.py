@@ -7,6 +7,7 @@ class Members(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        self.mint = 4126655
 
     # LISTENERS
     @commands.Cog.listener()
@@ -61,24 +62,34 @@ class Members(commands.Cog):
                 await ctx.send(f'Unbanned {user.name}')
 
     @commands.command()
-    async def mute(self, ctx, time=0, *, member: discord.Member):
+    async def mute(self, ctx, member: discord.Member, time=0):
         """ mutes specified member for specified time """
+        role = discord.utils.get(member.guild.roles, name='Muted')
+
         if not member:
             ctx.send('Give me someone to mute pls.')
             return
 
-        if self.client.user == member:
-            embed = discord.Embed(title='You can\'t mute me i am too comfy!')
-            await ctx.send(embed)
+        if self.client.user != member:
+            await member.add_roles(role)
+            embed = discord.Embed(
+                title='{0} has been muted by {1}.'.format(
+                    member, ctx.author),
+                colour=discord.Colour(self.mint)
+            )
+            await ctx.send(embed=embed)
+
+            if time > 0:
+                await asyncio.sleep(time * 60)
+                await member.remove_roles(role, reason='Time\'s up')
+
+        else:
+            embed = discord.Embed(
+                title='You can\'t mute me i am too comfy!',
+                colour=discord.Colour(self.mint)
+            )
+            await ctx.send(embed=embed)
             pass
-
-        role = discord.utils.get(member.guild.roles, name='Muted')
-        await member.add_roles(role)
-        await ctx.send('{0.mention} has been muted by {1.mention}.'.format(member, ctx.author))
-
-        if time > 0:
-            await asyncio.sleep(time * 60)
-            await member.remove_roles(role, reason='Time\'s up')
 
     # LOOPS
 
