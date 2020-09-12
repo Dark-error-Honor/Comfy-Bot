@@ -12,7 +12,7 @@ class Economy(commands.Cog):
 
     async def account(self, user):
         print('open account')
-        with open('./bank.json', 'r') as f:
+        with open('.\\bank.json', 'r') as f:
             users = json.load(f)
         print(users)
 
