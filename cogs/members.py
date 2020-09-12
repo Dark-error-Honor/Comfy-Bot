@@ -22,11 +22,8 @@ class Members(commands.Cog):
 
     # COMMANDS
     @commands.command()
-    async def invite(self, ctx, *, member):
+    async def invite(self, ctx, *, memeber: discord.Member):
         """ Sends a dm with server invite to specified member """
-        await ctx.send(member)
-        member = ctx.message.guild.get_member(member)
-        await ctx.send(member)
         channel = await member.create_dm()
         await channel.send(await ctx.channel.create_invite())
 
