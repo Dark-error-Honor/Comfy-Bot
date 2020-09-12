@@ -3,6 +3,7 @@ from discord.ext import commands
 
 import json
 import os
+import datetime
 
 
 class BankAccount():
@@ -92,7 +93,7 @@ class Economy(commands.Cog):
         lvl_end = int(user.exp ** (1/4))
 
         if lvl_start < lvl_end:
-            await channel.send(f'{user.user.mention} has leveled up to {lvl_end}')
+            await channel.send(f'{user.user.mention}\'s comfyness has leveled up to {lvl_end}')
 
         user.level = lvl_end
         await self.update_account(user)
@@ -107,9 +108,19 @@ class Economy(commands.Cog):
         await self.check_account(ctx.message.author)
 
     @commands.command()
-    async def level(self, ctx):
-        member = BankAccount(ctx.message.author)
-        await ctx.send(f'{member.user.mention} is level: {member.level}')
+    async def level(self, ctx, *, member: discord.Member = None):
+        try:
+            if not member:
+                member = BankAccount(ctx.message.author)
+            else:
+                member = BankAccount(member)
+            await ctx.send(f'{member.user.mention} is level: {member.level}')
+
+        except KeyError:
+            if member.name == 'Comfy Bot':
+                await ctx.send(f'{member.name} has an infinite comfy level')
+            else:
+                await ctx.send(f'{member.name} has no comfy level')
 
 
 def setup(client):
