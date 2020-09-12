@@ -28,7 +28,7 @@ class Default(commands.Cog):
         await ctx.send(f'{str(round(self.client.latency * 1000))}ms')
 
     @commands.command(aliases=['clear'])
-    async def clean(self, ctx, amount=5):
+    async def clean(self, ctx, amount=50):
         """ clean messages args: amount """
         await ctx.send(f'deleting {amount} messages')
         await ctx.channel.purge(limit=amount + 2)
