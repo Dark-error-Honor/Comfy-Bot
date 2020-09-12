@@ -12,13 +12,16 @@ class Default(commands.Cog):
     async def on_ready(self):
         print('Bot Is Online')
 
-    # @commands.Cog.listener()
-    # async def on_command_error(self, ctx, error):
-    #     if isinstance(error, commands.MissingRequiredArgument):
-    #         await ctx.send('Uhm... You forgot to give me a required argument.')
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Uhm... You forgot to give me a required argument.')
 
-    #     if isinstance(error, commands.errors.MissingPermissions):
-    #         await ctx.send('You are not comfy enough to do that.')
+        if isinstance(error, commands.errors.MissingPermissions):
+            await ctx.send('You are not comfy enough to do that.')
+
+        else:
+            await ctx.send(error)
 
     # COMMANDS
 
