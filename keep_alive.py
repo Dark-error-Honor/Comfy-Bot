@@ -4,7 +4,7 @@ from threading import Thread
 app = Flask('')
 
 
-@app.rout('/')
+@app.route('/')
 def main():
     return 'bot online'
 
