@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 import asyncio
+import time as t
+
+from .economy import UserAccount
 
 
 class Members(commands.Cog):
@@ -8,6 +11,7 @@ class Members(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.mint = 4126655
+        self.mute_time = {}
 
     # LISTENERS
     @commands.Cog.listener()
@@ -72,14 +76,19 @@ class Members(commands.Cog):
 
         if self.client.user != member:
             await member.add_roles(role)
-            embed = discord.Embed(
-                title='{0} has been muted by {1}.'.format(
-                    member, ctx.author),
+            embed = (discord.Embed(
+                title='Mute',
                 colour=discord.Colour(self.mint)
+            )
+                .add_field(name=f'{ctx.author} muted', value='{}.'.format(member), inline=False)
+                .add_field(name='Duration', value=str(time) + ' minutes', inline=False)
             )
             await ctx.send(embed=embed)
 
             if time > 0:
+                self.mute_time[member.name +
+                               str(member.discriminator)] = t.time() + time * 60
+                print(self.mute_time)
                 await asyncio.sleep(time * 60)
                 await member.remove_roles(role, reason='Time\'s up')
 
@@ -90,6 +99,15 @@ class Members(commands.Cog):
             )
             await ctx.send(embed=embed)
             pass
+
+    @commands.command()
+    async def mutetime(self, ctx, *, member: discord.Member):
+        try:
+            await ctx.send(f'{member.name} is muted for {int(self.mute_time[member.name + str(member.discriminator)] - t.time())} seconds.')
+            print(
+                int((self.mute_time[member.name + str(member.discriminator)] - t.time())))
+        except KeyError:
+            await ctx.send(f'{member.name} is not muted.')
 
     # LOOPS
 

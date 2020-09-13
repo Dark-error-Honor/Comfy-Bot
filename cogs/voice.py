@@ -466,8 +466,8 @@ class Music(commands.Cog):
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
 
-    @commands.command(aliases=['play', 'p'])
-    async def _play(self, ctx: commands.Context, *, search: str):
+    @commands.command(aliases=['ytplay', 'ytp'])
+    async def _ytplay(self, ctx: commands.Context, *, search: str):
         """Plays a song.
         If there are songs in the queue, this will be queued until the
         other songs finished playing.
@@ -490,7 +490,7 @@ class Music(commands.Cog):
                 await ctx.send('placed {} in queue'.format(str(source)))
 
     @_join.before_invoke
-    @_play.before_invoke
+    @_ytplay.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
             raise commands.CommandError(
