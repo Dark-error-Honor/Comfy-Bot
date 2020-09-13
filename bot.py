@@ -74,4 +74,4 @@ for filename in os.listdir(os.path.join(os.getcwd(), 'cogs')):
             print(e)
 
 keep_alive.keep_alive()
-client.run('NzUyMjMyNTI4NjcyMTk0NTcw.X1UpIg.bKoBzgJIl5zRKq62ZoR45Ub2wAQ')
+client.run('NzUyMjMyNTI4NjcyMTk0NTcw.X1UpIg.E4KgnKrn44XauWKZOTH6xIAACjA')
