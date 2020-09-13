@@ -327,8 +327,12 @@ class Music(commands.Cog):
         if not ctx.voice_state.voice:
             return await ctx.send('Not connected to any voice channel.')
 
-        await ctx.voice_state.stop()
-        del self.voice_states[ctx.guild.id]
+        try:
+            await ctx.send(f'I left {ctx.author.voice.channel} becauese it was not comfy anymore.')
+            await ctx.voice_state.stop()
+            del self.voice_states[ctx.guild.id]
+        except AttributeError:
+            await ctx.send('You can\'t do that, you are not in my channel')
 
     @commands.command(name='volume')
     async def _volume(self, ctx: commands.Context, *, volume: int):
