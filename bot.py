@@ -2,8 +2,6 @@ import discord
 import os
 from discord.ext import commands
 
-import keep_alive
-
 client = commands.Bot('-')
 owners = ['D4rK_Honor', 'rankzy']
 # client.remove_command('help')
@@ -73,5 +71,4 @@ for filename in os.listdir(os.path.join(os.getcwd(), 'cogs')):
         except Exception as e:
             print(e)
 
-keep_alive.keep_alive()
 client.run('NzUyMjMyNTI4NjcyMTk0NTcw.X1UpIg.E4KgnKrn44XauWKZOTH6xIAACjA')
