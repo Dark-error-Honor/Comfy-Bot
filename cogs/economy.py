@@ -22,7 +22,7 @@ class UserAccount():
         self.exp = self.users[self.entry]['excperience']
         self.level = self.users[self.entry]['level']
         self.mute_warning = self.users[self.entry]['mute_warn']
-        self.mute_time = self.users[self.entry]['mute_time']
+        self.mute_times = self.users[self.entry]['mute_times']
 
 
 class Economy(commands.Cog):
@@ -57,7 +57,7 @@ class Economy(commands.Cog):
         user.users[user.entry]['excperience'] = user.exp
         user.users[user.entry]['level'] = user.level
         user.users[user.entry]['mute_warn'] = user.mute_warning
-        user.users[user.entry]['mute_time'] = user.mute_time
+        user.users[user.entry]['mute_times'] = user.mute_times
 
         with open(user.file, 'w') as f:
             json.dump(user.users, f)
@@ -79,7 +79,7 @@ class Economy(commands.Cog):
             users[entry]['excperience'] = 0
             users[entry]['level'] = 1
             users[entry]['mute_warn'] = 0
-            users[entry]['mute_time'] = 0
+            users[entry]['mute_times'] = 0
 
             with open(self.file, 'w') as f:
                 json.dump(users, f)
