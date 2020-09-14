@@ -12,42 +12,83 @@ class Filter(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.bad_words = ['neger', 'nigger',
-                          'niger', 'dick', 'penis', 'pik', 'test']
+        self.bad_words = ['neger', 'nigger', 'niger',
+                          'dick', 'penis', 'pik', 'test', 'fuck']
         self.file = os.path.join('cogs', 'json', 'bank.json')
         self.mint = 4126655
+        self.mute_length = [5, 15, 30, 'forever']
+        self.admin_roles = ['Owner', 'Admins', 'Helper']
 
     @commands.Cog.listener()
     async def on_message(self, message):
+
+        for i in self.admin_roles:
+            role = discord.utils.get(message.guild.roles, name=i)
+
+            if role in message.author.roles:
+                return
+
         for bad_word in self.bad_words:
             if bad_word in message.content.lower():
+
+                mute = discord.utils.get(
+                    message.author.guild.roles, name='Muted')
+                await message.author.add_roles(mute)
+
                 await message.channel.send('That is not a comfy word.')
                 await message.delete()
 
                 await self.check_account(message.author)
                 user = UserAccount(message.author)
 
-                if user.mute_warning == 3 and user.mute_times == 0:
-                    command = self.client.get_command('mute')
-                    ctx = await self.client.get_context(message)
-                    role = discord.utils.get(
-                        message.author.guild.roles, name='Muted')
-                    time = 5
+                if user.mute_warning == 2 and user.mute_times == 0:
+                    await self.mute_timer(
+                        time=self.mute_length[0], message=message, user=user)
 
-                    await message.author.add_roles(role)
-                    user.mute_times += 1
-                    embed = await self.create_mute_embed(5, user)
-                    await ctx.send(embed=embed)
+                elif user.mute_warning == 4 and user.mute_times == 1:
+                    await self.mute_timer(
+                        time=self.mute_length[1], message=message, user=user)
 
-                    await self.update_account(user)
+                elif user.mute_warning == 7 and user.mute_times == 2:
+                    await self.mute_timer(
+                        time=self.mute_length[2], message=message, user=user)
 
-                    if time > 0:
-                        await asyncio.sleep(time * 60)
-                        await message.author.remove_roles(role, reason='Time\'s up')
+                elif user.mute_warning == 9 and user.mute_times == 3:
+                    await self.mute_timer(
+                        time=None, message=message, user=user)
 
                 else:
                     user.mute_warning += 1
+                    embed = await self.create_warning_embed(message=message, user=user)
+                    await message.channel.send(embed=embed)
                     await self.update_account(user)
+
+                await message.author.remove_roles(mute)
+
+    async def create_warning_embed(self, message, *, user):
+        if user.mute_times == 0:
+            until_mute = 3 - user.mute_warning
+
+        elif user.mute_times == 1:
+            until_mute = 5 - user.mute_warning
+
+        elif user.mute_times == 2:
+            until_mute = 8 - user.mute_warning
+
+        elif user.mute_times == 3:
+            until_mute = 10 - user.mute_warning
+
+        await message.channel.send(message.author.mention)
+        embed = (discord.Embed(
+            title='Warning',
+            colour=discord.Colour.orange()
+        )
+            .add_field(name='{}.'.format(user.name), value='You are warned.', inline=False)
+            .add_field(name='Why?', value='You have been warned because you used uncomfy words.', inline=False)
+            .add_field(name='Until Mute', value=f'U will be muted for {self.mute_length[user.mute_times]} minutes if you use: {until_mute} more uncomfy words.', inline=False)
+        )
+
+        return embed
 
     async def create_mute_embed(self, time, user):
         embed = (discord.Embed(
@@ -55,11 +96,39 @@ class Filter(commands.Cog):
             colour=discord.Colour(self.mint)
         )
             .add_field(name=f'I muted', value='{}.'.format(user.name), inline=False)
-            .add_field(name='Duration', value=str(time) + ' minutes', inline=False)
+            .add_field(name='Duration', value=time, inline=False)
             .add_field(name='reason', value='Used multiple not comfy words', inline=True)
         )
 
         return embed
+
+    async def mute_timer(self, time, message, *, user):
+
+        if time:
+            command = self.client.get_command('mute')
+            ctx = await self.client.get_context(message)
+            mute = discord.utils.get(
+                message.author.guild.roles, name='Muted')
+
+            user.mute_times += 1
+            await message.author.add_roles(mute)
+            embed = await self.create_mute_embed(str(time) + ' minutes', user)
+            await ctx.send(embed=embed)
+
+            await self.update_account(user)
+
+            if time > 0:
+                await asyncio.sleep(time * 60)
+                await message.author.remove_roles(mute, reason='Time\'s up')
+
+        else:
+            mute = discord.utils.get(
+                message.author.guild.roles, name='Muted')
+            ctx = await self.client.get_context(message)
+            await message.author.add_roles(mute)
+
+            embed = await self.create_mute_embed('forever', user)
+            await ctx.send(embed=embed)
 
     async def update_account(self, user):
         user.users[user.entry]['bank'] = user.bank
