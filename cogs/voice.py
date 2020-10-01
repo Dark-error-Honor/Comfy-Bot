@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+
+"""
+Copyright (c) 2019 Valentin B.
+A simple music bot written in discord.py using youtube-dl.
+Though it's a simple example, music bots are complex and require much time and knowledge until they work perfectly.
+Use this as an example or a base for your own bot and extend it as you want. If there are any bugs, please let me know.
+Requirements:
+Python 3.5+
+pip install -U discord.py pynacl youtube-dl
+You also need FFmpeg in your PATH environment variable or the FFmpeg.exe binary in your bot's directory on Windows.
+"""
+
 import asyncio
 import functools
 import itertools
@@ -45,7 +58,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     ytdl = youtube_dl.YoutubeDL(YTDL_OPTIONS)
 
-    def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = 0.25):
+    def __init__(self, ctx: commands.Context, source: discord.FFmpegPCMAudio, *, data: dict, volume: float = 0.5):
         super().__init__(source, volume)
 
         self.requester = ctx.author
@@ -146,7 +159,7 @@ class Song:
         embed = (discord.Embed(title='Now playing',
                                description='```css\n{0.source.title}\n```'.format(
                                    self),
-                               color=discord.Colour(4126655))
+                               color=discord.Color.blurple())
                  .add_field(name='Duration', value=self.source.duration)
                  .add_field(name='Requested by', value=self.requester.mention)
                  .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
@@ -190,7 +203,7 @@ class VoiceState:
         self.songs = SongQueue()
 
         self._loop = False
-        self._volume = 0.25
+        self._volume = 0.5
         self.skip_votes = set()
 
         self.audio_player = bot.loop.create_task(self.audio_player_task())
@@ -327,12 +340,8 @@ class Music(commands.Cog):
         if not ctx.voice_state.voice:
             return await ctx.send('Not connected to any voice channel.')
 
-        try:
-            await ctx.send(f'I left {ctx.author.voice.channel} becauese it was not comfy anymore.')
-            await ctx.voice_state.stop()
-            del self.voice_states[ctx.guild.id]
-        except AttributeError:
-            await ctx.send('You can\'t do that, you are not in my channel')
+        await ctx.voice_state.stop()
+        del self.voice_states[ctx.guild.id]
 
     @commands.command(name='volume')
     async def _volume(self, ctx: commands.Context, *, volume: int):
@@ -466,8 +475,8 @@ class Music(commands.Cog):
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
 
-    @commands.command(aliases=['ytplay', 'ytp'])
-    async def _ytplay(self, ctx: commands.Context, *, search: str):
+    @commands.command(name='play')
+    async def _play(self, ctx: commands.Context, *, search: str):
         """Plays a song.
         If there are songs in the queue, this will be queued until the
         other songs finished playing.
@@ -487,10 +496,10 @@ class Music(commands.Cog):
                 song = Song(source)
 
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('placed {} in queue'.format(str(source)))
+                await ctx.send('Enqueued {}'.format(str(source)))
 
     @_join.before_invoke
-    @_ytplay.before_invoke
+    @_play.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
             raise commands.CommandError(
@@ -502,5 +511,8 @@ class Music(commands.Cog):
                     'Bot is already in a voice channel.')
 
 
-def setup(client):
-    client.add_cog(Music(client))
+bot = commands.Bot('music.', description='Yet another music bot.')
+
+
+def setup(bot):
+    bot.add_cog(Music(bot))
