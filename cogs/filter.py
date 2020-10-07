@@ -15,6 +15,7 @@ class Filter(commands.Cog):
         self.bad_words = ['neger', 'nigger', 'niger',
                           'dick', 'penis', 'pik', 'test', 'fuck']
         self.file = os.path.join('cogs', 'json', 'bank.json')
+        self.filterFile = os.path.join('cogs', 'json', 'filter.json')
         self.mint = 4126655
         self.mute_length = [5, 15, 30, 'forever']
         self.admin_roles = ['Owner', 'Admins', 'Helper']
@@ -29,43 +30,75 @@ class Filter(commands.Cog):
 
             if role in message.author.roles:
                 return
+        with open(self.filterFile, 'r') as f:
+            bad_words = json.load(f)
 
-        for bad_word in self.bad_words:
-            if bad_word in message.content.lower():
+            for bad_word in bad_words['badWords']:
+                if bad_word in message.content.lower():
 
-                mute = discord.utils.get(
-                    message.author.guild.roles, name='Muted')
-                await message.author.add_roles(mute)
+                    mute = discord.utils.get(
+                        message.author.guild.roles, name='Muted')
+                    await message.author.add_roles(mute)
 
-                await message.channel.send('That is not a comfy word.')
-                await message.delete()
+                    await message.channel.send('That is not a comfy word.')
+                    await message.delete()
 
-                await self.check_account(message.author)
-                user = UserAccount(message.author)
+                    await self.check_account(message.author)
+                    user = UserAccount(message.author)
 
-                if user.mute_warning == 2 and user.mute_times == 0:
-                    await self.mute_timer(
-                        time=self.mute_length[0], message=message, user=user)
+                    if user.mute_warning == 2 and user.mute_times == 0:
+                        await self.mute_timer(
+                            time=self.mute_length[0], message=message, user=user)
 
-                elif user.mute_warning == 4 and user.mute_times == 1:
-                    await self.mute_timer(
-                        time=self.mute_length[1], message=message, user=user)
+                    elif user.mute_warning == 4 and user.mute_times == 1:
+                        await self.mute_timer(
+                            time=self.mute_length[1], message=message, user=user)
 
-                elif user.mute_warning == 7 and user.mute_times == 2:
-                    await self.mute_timer(
-                        time=self.mute_length[2], message=message, user=user)
+                    elif user.mute_warning == 7 and user.mute_times == 2:
+                        await self.mute_timer(
+                            time=self.mute_length[2], message=message, user=user)
 
-                elif user.mute_warning == 9 and user.mute_times == 3:
-                    await self.mute_timer(
-                        time=None, message=message, user=user)
+                    elif user.mute_warning == 9 and user.mute_times == 3:
+                        await self.mute_timer(
+                            time=None, message=message, user=user)
 
-                else:
-                    user.mute_warning += 1
-                    embed = await self.create_warning_embed(message=message, user=user)
-                    await message.channel.send(embed=embed)
-                    await self.update_account(user)
+                    else:
+                        user.mute_warning += 1
+                        embed = await self.create_warning_embed(message=message, user=user)
+                        await message.channel.send(embed=embed)
+                        await self.update_account(user)
 
-                await message.author.remove_roles(mute)
+                    await message.author.remove_roles(mute)
+
+    @commands.command()
+    async def addword(self, ctx, word):
+        if ctx.message.author.name == 'D4rK_Honor':
+            with open(self.filterFile, 'r') as f:
+                badWords = json.load(f)
+
+            if word not in badWords['badWords']:
+                badWords['badWords'].append(word)
+
+            else:
+                await ctx.send('That word is already filtered.')
+
+            with open(self.filterFile, 'w') as f:
+                json.dump(badWords, f)
+
+    @commands.command()
+    async def remword(self, ctx, word):
+        if ctx.message.author.name == 'D4rK_Honor':
+            with open(self.filterFile, 'r') as f:
+                badWords = json.load(f)
+
+            if word in badWords['badWords']:
+                badWords['badWords'].remove(word)
+
+            else:
+                await ctx.send('That word is not in the filter yet.')
+
+            with open(self.filterFile, 'w') as f:
+                json.dump(badWords, f)
 
     async def create_warning_embed(self, message, *, user):
         if user.mute_times == 0:
