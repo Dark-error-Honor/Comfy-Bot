@@ -303,6 +303,12 @@ class Music(commands.Cog):
     async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
         await ctx.send('An error occurred: {}'.format(str(error)))
 
+    @commands.command()
+    async def call(self, ctx, channel: discord.TextChannel):
+        role = discord.utils.get(ctx.guild.roles, name="Domme Kindjes")
+        for i in range(10):
+            await channel.send('{} Join de call'.format(role.mention))
+
     @commands.command(name='join', invoke_without_subcommand=True)
     async def _join(self, ctx: commands.Context):
         """Joins a voice channel."""

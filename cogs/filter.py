@@ -12,13 +12,11 @@ class Filter(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.bad_words = ['neger', 'nigger', 'niger',
-                          'dick', 'penis', 'pik', 'test', 'fuck']
         self.file = os.path.join('cogs', 'json', 'bank.json')
         self.filterFile = os.path.join('cogs', 'json', 'filter.json')
         self.mint = 4126655
         self.mute_length = [5, 15, 30, 'forever']
-        self.admin_roles = ['Owner', 'Admins', 'Helper']
+        self.admin_roles = ['Owner', 'Admins', 'Helper', 'Domme Kindjes']
 
     @commands.Cog.listener()
     async def on_message(self, message):

@@ -3,7 +3,7 @@ import os
 from discord.ext import commands
 
 client = commands.Bot('-')
-owners = ['D4rK_Honor', 'rankzy']
+owners = ['D4rK_Honor']
 # client.remove_command('help')
 
 
