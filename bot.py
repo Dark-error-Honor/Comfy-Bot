@@ -1,5 +1,6 @@
 import discord
 import os
+import config
 from discord.ext import commands
 
 client = commands.Bot('-')
@@ -71,4 +72,4 @@ for filename in os.listdir(os.path.join(os.getcwd(), 'cogs')):
         except Exception as e:
             print(e)
 
-client.run('NzUyMjMyNTI4NjcyMTk0NTcw.X1UpIg.E4KgnKrn44XauWKZOTH6xIAACjA')
+client.run(config.token)

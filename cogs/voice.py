@@ -304,6 +304,7 @@ class Music(commands.Cog):
         await ctx.send('An error occurred: {}'.format(str(error)))
 
     @commands.command()
+    @commands.cooldown(1, 120, commands.BucketType.guild)
     async def call(self, ctx, channel: discord.TextChannel):
         role = discord.utils.get(ctx.guild.roles, name="Domme Kindjes")
         for i in range(10):

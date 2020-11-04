@@ -13,47 +13,63 @@ class Members(commands.Cog):
         self.mint = 4126655
         self.mute_time = {}
 
+    async def addCounter(self, member):
+        for channel in member.guild.channels:
+            print(channel.name)
+            if 'e' in channel.name:
+                print("changing")
+                channel = await channel.edit(name='Members: {}'.format(
+                    str(len([m for m in member.guild.members if not m.bot]))))
+                print(channel)
+                break
+            else:
+                channel = await member.guild.create_voice_channel("Members: {}".format(str(len([m for m in member.guild.members if not m.bot]))))
+                break
+
     # LISTENERS
     @commands.Cog.listener()
     async def on_member_join(self, member):
         role = discord.utils.get(member.guild.roles, name='Member')
         await member.add_roles(role)
 
-        for guild in self.client.guilds:
-            for channel in guild.text_channels:
-                if channel.name == 'welcome':
-                    await channel.send(f'{member.name} Joined the server!')
+        await self.addCounter(member)
+
+        chan = await member.create_dm()
+        await chan.send('Hello welcome to {}!'.format(member.guild))
 
     # COMMANDS
-    @commands.command()
+    @ commands.command()
     async def invite(self, ctx, *, memeber: discord.Member):
         """ Sends a dm with server invite to specified member """
         channel = await member.create_dm()
         await channel.send(await ctx.channel.create_invite())
 
-    @commands.command()
+    @ commands.command()
     async def roleadd(self, ctx, member: discord.Member, *, role):
         """ adds role to mentioned member """
         role = discord.utils.get(member.guild.roles, name=role)
         await member.add_roles(role)
 
-    @commands.command()
+    @ commands.command()
     async def rolerem(self, ctx, member: discord.Member, *, role):
         """ removes role to mentioned member """
         role = discord.utils.get(member.guild.roles, name=role)
         await member.remove_roles(role)
 
     @commands.command()
+    @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         """ kicks memeber from server """
         await member.kick(reason=reason)
 
     @commands.command()
+    @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, *, reason=None):
         """ bans member args: usr object """
         await member.ban(reason=reason, delete_message_days=2)
 
-    @commands.command()
+    @ commands.command()
+    @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, *, member):
         """ unbans member args: name#tag """
         banned_users = await ctx.guild.bans()
@@ -65,7 +81,7 @@ class Members(commands.Cog):
                 await ctx.guild.unban(user)
                 await ctx.send(f'Unbanned {user.name}')
 
-    @commands.command()
+    @ commands.command()
     async def mute(self, ctx, member: discord.Member, time=0):
         """ mutes specified member for specified time """
         role = discord.utils.get(member.guild.roles, name='Muted')
@@ -100,7 +116,7 @@ class Members(commands.Cog):
             await ctx.send(embed=embed)
             pass
 
-    @commands.command()
+    @ commands.command()
     async def mutetime(self, ctx, *, member: discord.Member):
         try:
             await ctx.send(f'{member.name} is muted for {int(self.mute_time[member.name + str(member.discriminator)] - t.time())} seconds.')

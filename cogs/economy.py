@@ -34,7 +34,7 @@ class Economy(commands.Cog):
     # LISTENERS
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        self.check_account(member)
+        await self.check_account(member)
 
     @commands.Cog.listener()
     async def on_message(self, message):
